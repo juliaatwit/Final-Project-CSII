@@ -3,27 +3,22 @@ package application;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.scene.image.ImageView;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class Main extends Application {
-    private static final int SIZE = 8;
-    private static final int MINES = 10;
+    private int size = 8; // Default grid size
+    private int mines = 10; // Default number of mines
 
-    private Button[][] buttons = new Button[SIZE][SIZE];
-    private boolean[][] mines = new boolean[SIZE][SIZE];
-    private boolean[][] flagged = new boolean[SIZE][SIZE];
-    private int remainingFlags = MINES;
-    
-    private Image eggImage;
-    private Image brokenEggImage;
+    private Button[][] buttons;
+    private boolean[][] minesArray;
+    private boolean[][] flagged;
+    private int remainingFlags;
 
     public static void main(String[] args) {
         launch(args);
@@ -31,11 +26,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-    	// the egg and broken egg images
-        eggImage = new Image("https://img.freepik.com/free-vector/egg-cartoon-style_78370-1042.jpg");
-        brokenEggImage = new Image("https://img.freepik.com/premium-vector/egg-yolk-vector_688334-6.jpg?size=626&ext=jpg&ga=GA1.1.1880011253.1699747200&semt=ais");
+        showCustomizationDialog(); // Get user input for grid size and number of mines
 
-    	
         generateMines();
 
         GridPane grid = createGrid();
@@ -47,16 +39,39 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    private void showCustomizationDialog() {
+        TextInputDialog sizeDialog = new TextInputDialog("8");
+        sizeDialog.setTitle("Grid Size");
+        sizeDialog.setHeaderText(null);
+        sizeDialog.setContentText("Enter grid size:");
+
+        Optional<String> sizeResult = sizeDialog.showAndWait();
+        sizeResult.ifPresent(s -> size = Integer.parseInt(s));
+
+        TextInputDialog minesDialog = new TextInputDialog("10");
+        minesDialog.setTitle("Number of Mines");
+        minesDialog.setHeaderText(null);
+        minesDialog.setContentText("Enter number of mines:");
+
+        Optional<String> minesResult = minesDialog.showAndWait();
+        minesResult.ifPresent(m -> mines = Integer.parseInt(m));
+    }
+
     private void generateMines() {
+        buttons = new Button[size][size];
+        minesArray = new boolean[size][size];
+        flagged = new boolean[size][size];
+        remainingFlags = mines;
+
         Random random = new Random();
 
         int count = 0;
-        while (count < MINES) {
-            int x = random.nextInt(SIZE);
-            int y = random.nextInt(SIZE);
+        while (count < mines) {
+            int x = random.nextInt(size);
+            int y = random.nextInt(size);
 
-            if (!mines[x][y]) {
-                mines[x][y] = true;
+            if (!minesArray[x][y]) {
+                minesArray[x][y] = true;
                 count++;
             }
         }
@@ -68,8 +83,8 @@ public class Main extends Application {
         grid.setHgap(5);
         grid.setVgap(5);
 
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 buttons[i][j] = new Button();
                 buttons[i][j].setMinSize(40, 40);
                 final int x = i;
@@ -84,47 +99,17 @@ public class Main extends Application {
         return grid;
     }
 
-    //VERSION 1
     private void addButtonsToGrid(GridPane grid) {
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 // Initially, hide mines and flags
                 buttons[i][j].setText("");
             }
         }
     }
-    
-//    //VERSION 2 -- Adds Egg Images 
-//    private void addButtonsToGrid(GridPane grid) {
-//        for (int i = 0; i < SIZE; i++) {
-//            for (int j = 0; j < SIZE; j++) {
-//                buttons[i][j].setGraphic(new ImageView(eggImage));
-//            }
-//        }
-//    }
-    
-//    private void addButtonsToGrid(GridPane grid) {
-//        for (int i = 0; i < SIZE; i++) {
-//            for (int j = 0; j < SIZE; j++) {
-//                ImageView imageView = new ImageView(eggImage);
-//                imageView.setFitWidth(30); // Set the desired width
-//                imageView.setFitHeight(30); // Set the desired height
-//
-//                buttons[i][j] = new Button();
-//                buttons[i][j].setMinSize(40, 40);
-//                final int x = i;
-//                final int y = j;
-//                buttons[i][j].setOnAction(e -> handleButtonClick(x, y));
-//                buttons[i][j].setOnMouseClicked(e -> handleMouseClick(x, y, e));
-//                buttons[i][j].setGraphic(imageView);
-//
-//                grid.add(buttons[i][j], j, i);
-//            }
-//        }
-//    }
 
     private void handleButtonClick(int x, int y) {
-        if (mines[x][y]) {
+        if (minesArray[x][y]) {
             showGameOverAlert();
         } else {
             revealCell(x, y);
@@ -133,7 +118,7 @@ public class Main extends Application {
 
     private void handleMouseClick(int x, int y, javafx.scene.input.MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
-            // right-click for toggle flag
+            // Right-click to toggle flag
             toggleFlag(x, y);
         }
     }
@@ -141,18 +126,17 @@ public class Main extends Application {
     private void toggleFlag(int x, int y) {
         if (!buttons[x][y].isDisabled()) {
             if (!flagged[x][y] && remainingFlags > 0) {
-                buttons[x][y].setText("F"); // show flag
+                buttons[x][y].setText("F"); // Display flag
                 flagged[x][y] = true;
                 remainingFlags--;
             } else if (flagged[x][y]) {
-                buttons[x][y].setText(""); // remove flag
+                buttons[x][y].setText(""); // Remove flag
                 flagged[x][y] = false;
                 remainingFlags++;
             }
         }
     }
 
-    // VERSION 1
     private void revealCell(int x, int y) {
         buttons[x][y].setDisable(true);
 
@@ -164,34 +148,13 @@ public class Main extends Application {
                 for (int j = -1; j <= 1; j++) {
                     int newX = x + i;
                     int newY = y + j;
-                    if (newX >= 0 && newX < SIZE && newY >= 0 && newY < SIZE && !buttons[newX][newY].isDisabled()) {
+                    if (newX >= 0 && newX < size && newY >= 0 && newY < size && !buttons[newX][newY].isDisabled()) {
                         revealCell(newX, newY);
                     }
                 }
             }
         }
     }
-    
-//    //VERSION 2 ---- not really working
-//    private void revealCell(int x, int y) {
-//        buttons[x][y].setDisable(true);
-//
-//        int count = countNeighboringMines(x, y);
-//        if (count > 0) {
-//            buttons[x][y].setGraphic(new ImageView(brokenEggImage));
-//            buttons[x][y].setText(String.valueOf(count));
-//        } else {
-//            for (int i = -1; i <= 1; i++) {
-//                for (int j = -1; j <= 1; j++) {
-//                    int newX = x + i;
-//                    int newY = y + j;
-//                    if (newX >= 0 && newX < SIZE && newY >= 0 && newY < SIZE && !buttons[newX][newY].isDisabled()) {
-//                        revealCell(newX, newY);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private int countNeighboringMines(int x, int y) {
         int count = 0;
@@ -199,7 +162,7 @@ public class Main extends Application {
             for (int j = -1; j <= 1; j++) {
                 int newX = x + i;
                 int newY = y + j;
-                if (newX >= 0 && newX < SIZE && newY >= 0 && newY < SIZE && mines[newX][newY]) {
+                if (newX >= 0 && newX < size && newY >= 0 && newY < size && minesArray[newX][newY]) {
                     count++;
                 }
             }
@@ -211,7 +174,7 @@ public class Main extends Application {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Over");
         alert.setHeaderText(null);
-        alert.setContentText("You squashed an egg! Game over.");
+        alert.setContentText("You hit a mine! Game over.");
         alert.showAndWait();
         System.exit(0);
     }
