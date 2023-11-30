@@ -1,10 +1,14 @@
 package application;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -83,9 +87,27 @@ public class Main extends Application {
         grid.setHgap(5);
         grid.setVgap(5);
 
+        // Load the image
+        Image backgroundImage = new Image("http://benimatic.com/tfwiki/images/8/89/Forest_Grass.png");
+
+        // Set the background for each cell
+        BackgroundImage backgroundImg = new BackgroundImage(
+                backgroundImage,
+                null,
+                null,
+                null,
+                new BackgroundSize(100, 100, true, true, true, false)
+        );
+
+        Background background = new Background(backgroundImg);
+
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 buttons[i][j] = new Button();
+
+                // Set the background for each cell
+                buttons[i][j].setBackground(background);
+
                 buttons[i][j].setMinSize(40, 40);
                 final int x = i;
                 final int y = j;
@@ -117,7 +139,7 @@ public class Main extends Application {
     }
 
     private void handleMouseClick(int x, int y, javafx.scene.input.MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY) {
+        if (event.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
             // Right-click to toggle flag
             toggleFlag(x, y);
         }
