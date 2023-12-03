@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Random;
 
 public class MinesweeperApp extends Application {
-    private int size = 8; // Default grid size
+    private int size = 10; // Default grid size
     private int mines = 10; // Default number of mines
 
     private Button[][] buttons;
@@ -53,7 +53,7 @@ public class MinesweeperApp extends Application {
     }
 
     private void showCustomizationDialog() {
-        TextInputDialog sizeDialog = new TextInputDialog("8");
+        TextInputDialog sizeDialog = new TextInputDialog("10");
         sizeDialog.setTitle("Grid Size");
         sizeDialog.setHeaderText(null);
         sizeDialog.setContentText("Enter grid size:");
@@ -229,7 +229,7 @@ public class MinesweeperApp extends Application {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Over");
         alert.setHeaderText(null);
-        alert.setContentText("You hit a mine! Game over.");
+        alert.setContentText("You squashed an egg! Game over.");
         alert.showAndWait();
         System.exit(0);
     }
