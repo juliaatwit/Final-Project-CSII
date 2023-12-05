@@ -1,8 +1,8 @@
-## Wentworth Institute of Technology 
+# Wentworth Institute of Technology 
 Chickensweeper | COMP 1050: Computer Science II | Group 2: Danle Le, Bethsaida Cajuste, Julia Bisse
 December 4th, 2023 
 
-# Description
+## Description
 Minesweeper is a classic single-player puzzle game where the player 
 uncovers hidden mines on a grid using numeric clues provided for each 
 revealed cell. The goal is to uncover all safe cells without triggering 
