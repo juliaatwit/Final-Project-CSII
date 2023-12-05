@@ -1,6 +1,5 @@
 # Wentworth Institute of Technology 
-Chickensweeper | COMP 1050: Computer Science II | Group 2: Danle Le, Bethsaida Cajuste, Julia Bisse
-December 4th, 2023 
+Chickensweeper | COMP 1050: Computer Science II | Group 2: Danle Le, Bethsaida Cajuste, Julia Bisse | December 4th, 2023 
 
 ## Description
 Minesweeper is a classic single-player puzzle game where the player 
